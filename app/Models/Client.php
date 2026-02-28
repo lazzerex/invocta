@@ -29,18 +29,29 @@ class Client extends Model
         return $this->belongsTo(Tenant::class);
     }
 
-    public function getTotalBilledAttribute()
+    public function invoices()
     {
-        return 0;
+        return $this->hasMany(Invoice::class);
     }
 
-    public function getTotalPaidAttribute()
+    public function getTotalBilledAttribute(): float
     {
-        return 0;
+        return (float) $this->invoices()
+            ->whereNotIn('status', ['draft', 'cancelled'])
+            ->sum('total');
     }
 
-    public function getTotalOutstandingAttribute()
+    public function getTotalPaidAttribute(): float
     {
-        return 0;
+        return (float) $this->invoices()
+            ->where('status', 'paid')
+            ->sum('total');
+    }
+
+    public function getTotalOutstandingAttribute(): float
+    {
+        return (float) $this->invoices()
+            ->whereIn('status', ['sent', 'overdue'])
+            ->sum('total');
     }
 }
