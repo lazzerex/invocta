@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\GenerateInvoicePdf;
+use App\Actions\SendInvoiceEmail;
 use App\Enums\InvoiceStatus;
 use App\Http\Requests\StoreInvoiceRequest;
 use App\Http\Requests\UpdateInvoiceRequest;
@@ -9,6 +11,7 @@ use App\Models\Client;
 use App\Models\Invoice;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response as HttpResponse;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -163,6 +166,8 @@ class InvoiceController extends Controller
                 'notes' => $invoice->notes,
                 'terms' => $invoice->terms,
                 'sent_at' => $invoice->sent_at?->format('M j, Y g:i A'),
+                'email_sent_at' => $invoice->email_sent_at?->format('M j, Y g:i A'),
+                'email_sent_count' => $invoice->email_sent_count,
                 'paid_at' => $invoice->paid_at?->format('M j, Y g:i A'),
                 'is_overdue' => $invoice->is_overdue,
                 'items' => $invoice->items->map(fn ($item) => [
@@ -335,6 +340,19 @@ class InvoiceController extends Controller
         return redirect()->back()->with('success', 'Invoice marked as sent.');
     }
 
+    public function sendEmail(Invoice $invoice, SendInvoiceEmail $sender): RedirectResponse
+    {
+        $this->authorize('send_invoices');
+
+        if (!$invoice->status->canSend()) {
+            return redirect()->back()->with('error', 'This invoice cannot be sent.');
+        }
+
+        $sender->execute($invoice);
+
+        return redirect()->back()->with('success', 'Invoice email sent successfully.');
+    }
+
     public function markAsPaid(Request $request, Invoice $invoice): RedirectResponse
     {
         $this->authorize('edit_invoices');
@@ -359,5 +377,60 @@ class InvoiceController extends Controller
         $invoice->markAsCancelled();
 
         return redirect()->back()->with('success', 'Invoice cancelled.');
+    }
+
+    public function downloadPdf(Invoice $invoice, GenerateInvoicePdf $generator): HttpResponse
+    {
+        $this->authorize('view_invoices');
+
+        return $generator->download($invoice);
+    }
+
+    public function previewPdf(Invoice $invoice, GenerateInvoicePdf $generator): HttpResponse
+    {
+        $this->authorize('view_invoices');
+
+        return $generator->stream($invoice);
+    }
+
+    public function publicView(string $uuid): Response
+    {
+        $invoice = Invoice::withoutGlobalScopes()
+            ->where('public_uuid', $uuid)
+            ->with(['client', 'items', 'tenant'])
+            ->firstOrFail();
+
+        return Inertia::render('Invoices/Public', [
+            'invoice' => [
+                'invoice_number' => $invoice->invoice_number,
+                'tenant' => [
+                    'name' => $invoice->tenant->name,
+                ],
+                'client' => [
+                    'name' => $invoice->client->name,
+                    'email' => $invoice->client->email,
+                    'phone' => $invoice->client->phone,
+                    'address' => $invoice->client->address,
+                    'tax_id' => $invoice->client->tax_id,
+                ],
+                'status' => $invoice->status->value,
+                'status_label' => $invoice->status->label(),
+                'status_color' => $invoice->status->color(),
+                'issue_date' => $invoice->issue_date->format('M j, Y'),
+                'due_date' => $invoice->due_date->format('M j, Y'),
+                'subtotal' => number_format($invoice->subtotal, 2),
+                'tax_amount' => number_format($invoice->tax_amount, 2),
+                'total' => number_format($invoice->total, 2),
+                'notes' => $invoice->notes,
+                'terms' => $invoice->terms,
+                'items' => $invoice->items->map(fn ($item) => [
+                    'description' => $item->description,
+                    'quantity' => number_format($item->quantity, 2),
+                    'unit_price' => number_format($item->unit_price, 2),
+                    'tax_rate' => number_format($item->tax_rate, 2),
+                    'amount' => number_format($item->amount, 2),
+                ]),
+            ],
+        ]);
     }
 }
