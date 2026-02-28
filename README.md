@@ -1,6 +1,22 @@
+<p align="center">
+    <img width="578" height="329" alt="invocta-no-edit-removebg-preview" src="https://github.com/user-attachments/assets/2fddc4ef-d9a5-43db-b73a-9c477492ea10" />
+</p>
+
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Laravel-12-FF2D20?style=flat&logo=laravel&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Vue.js-3-4FC08D?style=flat&logo=vue.js&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Inertia.js-2-9553E9?style=flat&logo=inertia&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Tailwind_CSS-3.4-06B6D4?style=flat&logo=tailwindcss&logoColor=white"/>
+  <img src="https://img.shields.io/badge/MySQL-8.0-4479A1?style=flat&logo=mysql&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Stripe-Cashier-635BFF?style=flat&logo=stripe&logoColor=white"/>
+</p>
+
 # Invocta
 
 A Multi-Tenant SaaS Invoicing Platform built with the VILT stack (Vue.js + Inertia.js + Laravel + Tailwind CSS).
+
+
 
 ## About
 
