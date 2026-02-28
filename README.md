@@ -47,7 +47,7 @@ Invocta is a production-grade SaaS platform where businesses (tenants) can sign 
 
 ```bash
 # Clone the repository
-git clone <repository-url> invocta
+git clone https://github.com/lazzerex/invocta
 cd invocta
 
 # Install PHP dependencies
