@@ -20,6 +20,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'tenant' => \Spatie\Multitenancy\Http\Middleware\NeedsTenant::class,
             'tenant.user' => \App\Http\Middleware\SetTenantFromUser::class,
         ]);
+
+        $middleware->validateCsrfTokens(except: [
+            'stripe/webhook',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

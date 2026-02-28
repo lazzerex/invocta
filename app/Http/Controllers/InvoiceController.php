@@ -169,6 +169,8 @@ class InvoiceController extends Controller
                 'email_sent_at' => $invoice->email_sent_at?->format('M j, Y g:i A'),
                 'email_sent_count' => $invoice->email_sent_count,
                 'paid_at' => $invoice->paid_at?->format('M j, Y g:i A'),
+                'payment_method' => $invoice->payment_method,
+                'amount_paid' => $invoice->amount_paid ? number_format($invoice->amount_paid, 2) : null,
                 'is_overdue' => $invoice->is_overdue,
                 'items' => $invoice->items->map(fn ($item) => [
                     'id' => $item->id,
@@ -188,6 +190,7 @@ class InvoiceController extends Controller
             'canEdit' => $request->user()->can('edit_invoices'),
             'canDelete' => $request->user()->can('delete_invoices'),
             'canSend' => $request->user()->can('send_invoices'),
+            'publicInvoiceUrl' => route('public.invoice', $invoice->public_uuid),
         ]);
     }
 
@@ -402,6 +405,7 @@ class InvoiceController extends Controller
 
         return Inertia::render('Invoices/Public', [
             'invoice' => [
+                'uuid' => $invoice->public_uuid,
                 'invoice_number' => $invoice->invoice_number,
                 'tenant' => [
                     'name' => $invoice->tenant->name,
@@ -423,6 +427,8 @@ class InvoiceController extends Controller
                 'total' => number_format($invoice->total, 2),
                 'notes' => $invoice->notes,
                 'terms' => $invoice->terms,
+                'paid_at' => $invoice->paid_at?->format('M j, Y'),
+                'can_pay' => $invoice->status->canMarkPaid(),
                 'items' => $invoice->items->map(fn ($item) => [
                     'description' => $item->description,
                     'quantity' => number_format($item->quantity, 2),
@@ -431,6 +437,22 @@ class InvoiceController extends Controller
                     'amount' => number_format($item->amount, 2),
                 ]),
             ],
+            'stripeEnabled' => !empty(config('cashier.secret')),
         ]);
+    }
+
+    public function publicMarkAsPaid(string $uuid): RedirectResponse
+    {
+        $invoice = Invoice::withoutGlobalScopes()
+            ->where('public_uuid', $uuid)
+            ->firstOrFail();
+
+        if (!$invoice->status->canMarkPaid()) {
+            return redirect()->back()->with('error', 'This invoice cannot be marked as paid.');
+        }
+
+        $invoice->markAsPaid();
+
+        return redirect()->back()->with('success', 'Invoice marked as paid. Thank you!');
     }
 }

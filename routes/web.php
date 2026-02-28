@@ -3,7 +3,9 @@
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\InvoicePaymentController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\StripeWebhookController;
 use App\Http\Controllers\TeamController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -51,5 +53,11 @@ Route::get('/invitations/{token}', [InvitationController::class, 'show'])->name(
 Route::post('/invitations/{token}/accept', [InvitationController::class, 'accept'])->name('invitations.accept');
 
 Route::get('/i/{uuid}', [InvoiceController::class, 'publicView'])->name('public.invoice');
+Route::post('/i/{uuid}/mark-paid', [InvoiceController::class, 'publicMarkAsPaid'])->name('public.invoice.mark-paid');
+Route::get('/i/{uuid}/pay', [InvoicePaymentController::class, 'checkout'])->name('public.invoice.pay');
+Route::get('/i/{uuid}/payment/success', [InvoicePaymentController::class, 'success'])->name('public.invoice.payment.success');
+Route::get('/i/{uuid}/payment/cancel', [InvoicePaymentController::class, 'cancel'])->name('public.invoice.payment.cancel');
+
+Route::post('/stripe/webhook', [StripeWebhookController::class, 'handle'])->name('stripe.webhook');
 
 require __DIR__.'/auth.php';

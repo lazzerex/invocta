@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use Laravel\Cashier\Billable;
 use Spatie\Multitenancy\Models\Tenant as BaseTenant;
 
 class Tenant extends BaseTenant
 {
+    use Billable;
+
     protected $fillable = [
         'name',
         'domain',
