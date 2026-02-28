@@ -77,8 +77,21 @@ class ClientController extends Controller
             'total_billed' => $client->total_billed,
             'total_paid' => $client->total_paid,
             'total_outstanding' => $client->total_outstanding,
-            'invoice_count' => 0,
+            'invoice_count' => $client->invoices()->count(),
         ];
+
+        $recentInvoices = $client->invoices()
+            ->latest()
+            ->take(5)
+            ->get()
+            ->map(fn ($invoice) => [
+                'id' => $invoice->id,
+                'number' => $invoice->invoice_number,
+                'status' => $invoice->status->value,
+                'total' => $invoice->total,
+                'due_date' => $invoice->due_date->format('M j, Y'),
+                'created_at' => $invoice->created_at->format('M j, Y'),
+            ]);
 
         return Inertia::render('Clients/Show', [
             'client' => [
@@ -91,7 +104,7 @@ class ClientController extends Controller
                 'created_at' => $client->created_at->format('M j, Y'),
             ],
             'stats' => $stats,
-            'recentInvoices' => [],
+            'recentInvoices' => $recentInvoices,
             'canEdit' => $request->user()->can('edit_clients'),
             'canDelete' => $request->user()->can('delete_clients'),
         ]);
