@@ -37,6 +37,8 @@ class Invoice extends Model
         'terms',
         'public_uuid',
         'sent_at',
+        'email_sent_at',
+        'email_sent_count',
         'paid_at',
     ];
 
@@ -50,6 +52,7 @@ class Invoice extends Model
             'tax_amount' => 'decimal:2',
             'total' => 'decimal:2',
             'sent_at' => 'datetime',
+            'email_sent_at' => 'datetime',
             'paid_at' => 'datetime',
         ];
     }
@@ -107,6 +110,16 @@ class Invoice extends Model
         $this->update([
             'status' => InvoiceStatus::Sent,
             'sent_at' => now(),
+        ]);
+    }
+
+    public function markAsEmailSent(): void
+    {
+        $this->update([
+            'status' => InvoiceStatus::Sent,
+            'sent_at' => $this->sent_at ?? now(),
+            'email_sent_at' => now(),
+            'email_sent_count' => $this->email_sent_count + 1,
         ]);
     }
 
