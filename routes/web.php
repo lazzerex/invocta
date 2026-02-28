@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ClientController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TeamController;
@@ -32,6 +33,8 @@ Route::middleware(['auth', 'tenant.user'])->group(function () {
     Route::post('/invitations', [InvitationController::class, 'store'])->name('invitations.store');
     Route::delete('/invitations/{invitation}', [InvitationController::class, 'destroy'])->name('invitations.destroy');
     Route::post('/invitations/{invitation}/resend', [InvitationController::class, 'resend'])->name('invitations.resend');
+
+    Route::resource('clients', ClientController::class);
 });
 
 Route::get('/invitations/{token}', [InvitationController::class, 'show'])->name('invitations.show');
