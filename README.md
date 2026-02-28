@@ -1,59 +1,108 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Invocta
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A Multi-Tenant SaaS Invoicing Platform built with the VILT stack (Vue.js + Inertia.js + Laravel + Tailwind CSS).
 
-## About Laravel
+## About
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Invocta is a production-grade SaaS platform where businesses (tenants) can sign up, get their own isolated workspace, manage clients, create and send invoices, and handle subscriptions with auto-billing via Stripe. Each tenant is completely isolated from other tenants.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Tech Stack
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **Backend:** Laravel 12
+- **Frontend:** Vue 3 + Inertia.js
+- **Styling:** Tailwind CSS
+- **Multi-tenancy:** Spatie Laravel-Multitenancy
+- **Roles & Permissions:** Spatie Laravel-Permission
+- **Payments & Subscriptions:** Laravel Cashier (Stripe)
+- **PDF Generation:** DomPDF
+- **Database:** MySQL
+- **Auth:** Laravel Breeze
 
-## Learning Laravel
+## Features
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+### Implemented
+- User registration with automatic tenant creation
+- Multi-tenancy with data isolation
+- Role-based access control (Admin, Manager, Staff)
+- Team management with email invitations
+- Permission-based authorization
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Planned
+- Client management (CRUD)
+- Invoice management with line items
+- PDF generation and email delivery
+- Public invoice view with Stripe payments
+- Subscription billing via Stripe
+- Dashboard analytics
+- Tenant settings and branding
 
-## Laravel Sponsors
+## Requirements
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+- PHP 8.2+
+- Composer
+- Node.js 18+
+- MySQL 8.0+
 
-### Premium Partners
+## Installation
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+```bash
+# Clone the repository
+git clone <repository-url> invocta
+cd invocta
 
-## Contributing
+# Install PHP dependencies
+composer install
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+# Install Node dependencies
+npm install
 
-## Code of Conduct
+# Copy environment file
+cp .env.example .env
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+# Generate application key
+php artisan key:generate
 
-## Security Vulnerabilities
+# Configure your database in .env
+# DB_DATABASE=invocta
+# DB_USERNAME=root
+# DB_PASSWORD=
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+# Run migrations and seed
+php artisan migrate --seed
+```
+
+## Development
+
+Run both servers in separate terminals:
+
+```bash
+# Terminal 1: Laravel backend
+php artisan serve
+
+# Terminal 2: Vite frontend
+npm run dev
+```
+
+Access the application at `http://localhost:8000`
+
+## Test Accounts
+
+After seeding, these accounts are available:
+
+| Email | Password | Tenant | Role |
+|-------|----------|--------|------|
+| john@acme.com | password | Acme Corporation | Admin |
+| tony@stark.com | password | Stark Industries | Admin |
+
+## Roles & Permissions
+
+| Role | Permissions |
+|------|-------------|
+| Admin | Full access to all features |
+| Manager | Manage clients and invoices, view team |
+| Staff | View clients and invoices only |
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is proprietary software.
+
