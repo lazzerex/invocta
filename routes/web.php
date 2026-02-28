@@ -39,12 +39,17 @@ Route::middleware(['auth', 'tenant.user'])->group(function () {
 
     Route::post('/invoices/{invoice}/duplicate', [InvoiceController::class, 'duplicate'])->name('invoices.duplicate');
     Route::post('/invoices/{invoice}/send', [InvoiceController::class, 'markAsSent'])->name('invoices.send');
+    Route::post('/invoices/{invoice}/send-email', [InvoiceController::class, 'sendEmail'])->name('invoices.send-email');
     Route::post('/invoices/{invoice}/mark-paid', [InvoiceController::class, 'markAsPaid'])->name('invoices.mark-paid');
     Route::post('/invoices/{invoice}/cancel', [InvoiceController::class, 'markAsCancelled'])->name('invoices.cancel');
+    Route::get('/invoices/{invoice}/download', [InvoiceController::class, 'downloadPdf'])->name('invoices.download');
+    Route::get('/invoices/{invoice}/preview', [InvoiceController::class, 'previewPdf'])->name('invoices.preview');
     Route::resource('invoices', InvoiceController::class);
 });
 
 Route::get('/invitations/{token}', [InvitationController::class, 'show'])->name('invitations.show');
 Route::post('/invitations/{token}/accept', [InvitationController::class, 'accept'])->name('invitations.accept');
+
+Route::get('/i/{uuid}', [InvoiceController::class, 'publicView'])->name('public.invoice');
 
 require __DIR__.'/auth.php';
