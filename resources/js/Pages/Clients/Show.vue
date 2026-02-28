@@ -186,8 +186,10 @@ const statusColors = {
                                 </thead>
                                 <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                                     <tr v-for="invoice in recentInvoices" :key="invoice.id">
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-indigo-600 dark:text-indigo-400">
-                                            {{ invoice.number }}
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <Link :href="route('invoices.show', invoice.id)" class="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300">
+                                                {{ invoice.number }}
+                                            </Link>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full capitalize"
