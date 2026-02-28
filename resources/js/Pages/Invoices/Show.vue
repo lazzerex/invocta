@@ -12,10 +12,12 @@ const props = defineProps({
     canEdit: Boolean,
     canDelete: Boolean,
     canSend: Boolean,
+    publicInvoiceUrl: String,
 });
 
 const showDeleteModal = ref(false);
 const showCancelModal = ref(false);
+const showLinkCopied = ref(false);
 
 const deleteForm = useForm({});
 const statusForm = useForm({});
@@ -50,6 +52,18 @@ const markAsCancelled = () => {
 
 const duplicate = () => {
     statusForm.post(route('invoices.duplicate', props.invoice.id));
+};
+
+const copyPublicLink = async () => {
+    try {
+        await navigator.clipboard.writeText(props.publicInvoiceUrl);
+        showLinkCopied.value = true;
+        setTimeout(() => {
+            showLinkCopied.value = false;
+        }, 2000);
+    } catch (err) {
+        console.error('Failed to copy link:', err);
+    }
 };
 
 const getStatusClasses = (color) => {
@@ -89,6 +103,9 @@ const getStatusClasses = (color) => {
                     >
                         Download PDF
                     </a>
+                    <SecondaryButton @click="copyPublicLink" :disabled="showLinkCopied">
+                        {{ showLinkCopied ? 'Link Copied!' : 'Copy Public Link' }}
+                    </SecondaryButton>
                     <SecondaryButton @click="duplicate" :disabled="statusForm.processing">
                         Duplicate
                     </SecondaryButton>
@@ -155,6 +172,10 @@ const getStatusClasses = (color) => {
                                 </div>
                                 <div v-if="invoice.paid_at" class="text-sm text-green-600 dark:text-green-400 mt-1">
                                     <span class="font-medium">Paid:</span> {{ invoice.paid_at }}
+                                    <span v-if="invoice.payment_method" class="ml-1 capitalize">(via {{ invoice.payment_method }})</span>
+                                </div>
+                                <div v-if="invoice.amount_paid" class="text-sm text-green-600 dark:text-green-400 mt-1">
+                                    <span class="font-medium">Amount Paid:</span> ${{ invoice.amount_paid }}
                                 </div>
                             </div>
                         </div>
