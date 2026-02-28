@@ -16,4 +16,9 @@ class Tenant extends BaseTenant
     {
         return $this->hasMany(User::class);
     }
+
+    public function invitations()
+    {
+        return $this->hasMany(Invitation::class);
+    }
 }
