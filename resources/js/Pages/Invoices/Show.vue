@@ -32,6 +32,10 @@ const markAsSent = () => {
     statusForm.post(route('invoices.send', props.invoice.id));
 };
 
+const sendEmail = () => {
+    statusForm.post(route('invoices.send-email', props.invoice.id));
+};
+
 const markAsPaid = () => {
     statusForm.post(route('invoices.mark-paid', props.invoice.id));
 };
@@ -79,15 +83,24 @@ const getStatusClasses = (color) => {
                     </span>
                 </div>
                 <div class="flex items-center gap-2">
+                    <a
+                        :href="route('invoices.download', invoice.id)"
+                        class="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-500 rounded-md font-semibold text-xs text-gray-700 dark:text-gray-300 uppercase tracking-widest shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition"
+                    >
+                        Download PDF
+                    </a>
                     <SecondaryButton @click="duplicate" :disabled="statusForm.processing">
                         Duplicate
                     </SecondaryButton>
                     <Link v-if="canEdit && invoice.can_edit" :href="route('invoices.edit', invoice.id)">
                         <SecondaryButton>Edit</SecondaryButton>
                     </Link>
-                    <PrimaryButton v-if="canSend && invoice.can_send" @click="markAsSent" :disabled="statusForm.processing">
-                        Mark as Sent
+                    <PrimaryButton v-if="canSend && invoice.can_send" @click="sendEmail" :disabled="statusForm.processing">
+                        Send Email
                     </PrimaryButton>
+                    <SecondaryButton v-if="canSend && invoice.can_send" @click="markAsSent" :disabled="statusForm.processing">
+                        Mark as Sent
+                    </SecondaryButton>
                     <PrimaryButton v-if="canEdit && invoice.can_mark_paid" @click="markAsPaid" :disabled="statusForm.processing" class="bg-green-600 hover:bg-green-700">
                         Mark as Paid
                     </PrimaryButton>
@@ -135,6 +148,10 @@ const getStatusClasses = (color) => {
                             <div class="text-right">
                                 <div v-if="invoice.sent_at" class="text-sm text-gray-600 dark:text-gray-400">
                                     <span class="font-medium">Sent:</span> {{ invoice.sent_at }}
+                                </div>
+                                <div v-if="invoice.email_sent_at" class="text-sm text-blue-600 dark:text-blue-400 mt-1">
+                                    <span class="font-medium">Email Sent:</span> {{ invoice.email_sent_at }}
+                                    <span v-if="invoice.email_sent_count > 1" class="text-xs">({{ invoice.email_sent_count }} times)</span>
                                 </div>
                                 <div v-if="invoice.paid_at" class="text-sm text-green-600 dark:text-green-400 mt-1">
                                     <span class="font-medium">Paid:</span> {{ invoice.paid_at }}
